@@ -18,13 +18,13 @@ import math
 
 from std_msgs.msg import Float64
 
-max_value = 1
+max_value = 2
 
 def scale_input(value):
     global max_value
     if value > max_value:
         max_value = value
-    return value/max_value
+    return (value/max_value) * 2
 
 rospy.init_node('gummi', anonymous=True)
 r = rospy.Rate(30)
