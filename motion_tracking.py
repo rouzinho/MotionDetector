@@ -2,7 +2,7 @@
 
 
 import pyrealsense2 as rs
-from imutils.video import VideoStream
+#from imutils.video import VideoStream
 import argparse
 import datetime
 import numpy as np
@@ -18,16 +18,21 @@ import math
 
 from std_msgs.msg import Float64
 
-max_value = 2
+
+max_value = 2.00
 
 def scale_input(value):
     global max_value
-    if value > max_value:
-        max_value = value
-    return (value/max_value) * 2
+    #if value > max_value:
+    #    max_value = float(value)
+    #print("value : ",value)
+    #print("value max :",max_value)
+    #t = float(value/max_value)
+    #print("returned : ",t)
+    return (value/50000) * 2
 
 rospy.init_node('gummi', anonymous=True)
-r = rospy.Rate(30)
+r = rospy.Rate(100)
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -48,8 +53,8 @@ if args.get("video", None) is None:
     pipeline.start(config)
     time.sleep(2.0)
 # otherwise, we are reading from a video file
-else:
-	vs = cv2.VideoCapture(args["video"])
+#else:
+	#vs = cv2.VideoCapture(args["video"])
 
 # initialize the first frame in the video stream
 firstFrame = None
@@ -80,8 +85,9 @@ try:
 
         n_white_pix = np.sum(thresh == 255)
         firstFrame = gray
-        val = scale_input(n_white_pix)
-        print(val)
+        val = scale_input(float(n_white_pix))
+        #print(n_white_pix)
+        #print(val)
         value_motion = Float64(val)
         motion_detector.publish(value_motion)
 
@@ -96,7 +102,10 @@ try:
         #cv2.imshow('BaseImage', baseImage)
         cv2.imshow('Threshold', thresh)
         #cv2.imshow('FrameDelta', frameDelta)
-        cv2.waitKey(1)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
+
 
 finally:
 
